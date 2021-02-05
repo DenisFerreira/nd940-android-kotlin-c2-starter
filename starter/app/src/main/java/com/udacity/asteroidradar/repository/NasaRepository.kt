@@ -10,14 +10,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class NasaRepository(private val database: NasaDatabase) {
-    val pictureOfDay: LiveData<PictureOfDay>
-        get() = database.dao.getPictureOfDay().map { it?.asModel() ?: PictureOfDay("","", "")  }
+    val pictureOfDay: LiveData<PictureOfDay?>
+        get() = database.dao.getPictureOfDay().map { it?.asModel() }
 
     suspend fun refresh() {
         withContext(Dispatchers.IO) {
             try {
                 val apodValue = NasaApi.RETROFIT_SERVICE.getAPOD("xsfeJEdHdBgIgCIkEp9skjoMYh6JKAbbIcfCkZS1").await()
                 database.dao.insert(apodValue.asDatabaseModel())
+                Log.e("NASARepository", "Data Refreshed")
             }catch (e: Exception) {
                 Log.e("NASARepository", e.message?:"No internet Connection")
             }

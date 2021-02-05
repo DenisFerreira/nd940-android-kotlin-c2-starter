@@ -20,7 +20,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             repository.refresh()
         }
     }
-    private val _apod = MutableLiveData<PictureOfDay>()
-    val apod: LiveData<PictureOfDay> = repository.pictureOfDay
+    val apod: LiveData<PictureOfDay?> = repository.pictureOfDay
 
 }

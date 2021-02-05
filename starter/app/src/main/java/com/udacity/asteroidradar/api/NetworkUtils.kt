@@ -2,7 +2,6 @@ package com.udacity.asteroidradar.api
 
 import android.os.Parcelable
 import com.udacity.asteroidradar.models.Asteroid
-import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.database.PictureofDayDBModel
 import kotlinx.android.parcel.Parcelize
 import org.json.JSONObject
