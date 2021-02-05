@@ -1,8 +1,14 @@
 package com.udacity.asteroidradar
 
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.net.toUri
 import androidx.databinding.BindingAdapter
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
+
 
 @BindingAdapter("statusIcon")
 fun bindAsteroidStatusImage(imageView: ImageView, isHazardous: Boolean) {
@@ -39,3 +45,34 @@ fun bindTextViewToDisplayVelocity(textView: TextView, number: Double) {
     val context = textView.context
     textView.text = String.format(context.getString(R.string.km_s_unit_format), number)
 }
+
+@BindingAdapter("imageUrl")
+fun bindImageUrl(imgView: ImageView, imgUrl: String?) {
+    imgUrl?.let {
+        val imgUri = it.toUri().buildUpon().scheme("https").build()
+        Glide.with(imgView.context)
+                .load(imgUri)
+                .apply(
+                        RequestOptions()
+                                .placeholder(R.drawable.loading_animation)
+                                .error(R.drawable.ic_connection_error)
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    )
+                .into(imgView)
+    }
+
+}
+
+//@BindingAdapter("imageLoadingStatus")
+//fun bindStatus(statusImgView: ImageView, status: NasaApiStatus?) {
+//    when(status){
+//        NasaApiStatus.LOADING -> {
+//            statusImgView.setImageResource(R.drawable.loading_animation)
+//        }
+//        NasaApiStatus.ERROR -> {
+//            statusImgView.setImageResource(R.drawable.ic_connection_error)
+//        }
+//        NasaApiStatus.DONE -> {
+//        }
+//    }
+//}

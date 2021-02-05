@@ -1,4 +1,4 @@
-package com.udacity.asteroidradar.detail
+package com.udacity.asteroidradar.ui.detail
 
 
 import android.os.Bundle
@@ -29,8 +29,8 @@ class DetailFragment : Fragment() {
 
     private fun displayAstronomicalUnitExplanationDialog() {
         val builder = AlertDialog.Builder(requireActivity())
-            .setMessage(getString(R.string.astronomica_unit_explanation))
-            .setPositiveButton(android.R.string.ok, null)
+                .setMessage(getString(R.string.astronomica_unit_explanation))
+                .setPositiveButton(android.R.string.ok, null)
         builder.create().show()
     }
 }
