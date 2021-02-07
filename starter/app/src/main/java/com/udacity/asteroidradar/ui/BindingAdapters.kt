@@ -1,6 +1,5 @@
 package com.udacity.asteroidradar
 
-import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.net.toUri
@@ -8,14 +7,17 @@ import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import com.udacity.asteroidradar.models.PictureOfDay
 
 
 @BindingAdapter("statusIcon")
 fun bindAsteroidStatusImage(imageView: ImageView, isHazardous: Boolean) {
     if (isHazardous) {
         imageView.setImageResource(R.drawable.ic_status_potentially_hazardous)
+        imageView.contentDescription = "Potentially Hazardous asteroid image"
     } else {
         imageView.setImageResource(R.drawable.ic_status_normal)
+        imageView.contentDescription = "Normal asteroid image"
     }
 }
 
@@ -23,9 +25,12 @@ fun bindAsteroidStatusImage(imageView: ImageView, isHazardous: Boolean) {
 fun bindDetailsStatusImage(imageView: ImageView, isHazardous: Boolean) {
     if (isHazardous) {
         imageView.setImageResource(R.drawable.asteroid_hazardous)
+        imageView.contentDescription = "Hazardous asteroid status"
     } else {
         imageView.setImageResource(R.drawable.asteroid_safe)
+        imageView.contentDescription = "Safe asteroid status"
     }
+
 }
 
 @BindingAdapter("astronomicalUnitText")
@@ -46,10 +51,12 @@ fun bindTextViewToDisplayVelocity(textView: TextView, number: Double) {
     textView.text = String.format(context.getString(R.string.km_s_unit_format), number)
 }
 
-@BindingAdapter("imageUrl")
-fun bindImageUrl(imgView: ImageView, imgUrl: String?) {
-    imgUrl?.let {
-        val imgUri = it.toUri().buildUpon().scheme("https").build()
+@BindingAdapter("PictureOfDay")
+fun bindImageUrl(imgView: ImageView, pictureOfDay: PictureOfDay?) {
+    pictureOfDay?.let {
+        if(!pictureOfDay.mediaType.equals("image"))
+            return@let
+        val imgUri = it.url.toUri().buildUpon().scheme("https").build()
         Glide.with(imgView.context)
                 .load(imgUri)
                 .apply(
@@ -59,20 +66,7 @@ fun bindImageUrl(imgView: ImageView, imgUrl: String?) {
                                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                     )
                 .into(imgView)
+        imgView.contentDescription = pictureOfDay.explanation
     }
 
 }
-
-//@BindingAdapter("imageLoadingStatus")
-//fun bindStatus(statusImgView: ImageView, status: NasaApiStatus?) {
-//    when(status){
-//        NasaApiStatus.LOADING -> {
-//            statusImgView.setImageResource(R.drawable.loading_animation)
-//        }
-//        NasaApiStatus.ERROR -> {
-//            statusImgView.setImageResource(R.drawable.ic_connection_error)
-//        }
-//        NasaApiStatus.DONE -> {
-//        }
-//    }
-//}

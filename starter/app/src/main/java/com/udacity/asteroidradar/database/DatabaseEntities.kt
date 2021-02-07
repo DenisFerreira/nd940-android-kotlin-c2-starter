@@ -19,22 +19,24 @@ package com.udacity.asteroidradar.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.udacity.asteroidradar.models.Asteroid
 import com.udacity.asteroidradar.models.PictureOfDay
 
 @Entity
 data class PictureofDayDBModel(
-        val date: String,
-        val explanation: String,
-        val hdurl: String,
-        val media_type: String,
-        val service_version: String,
-        val title: String,
-        @PrimaryKey
-        val url: String
+    val date: String,
+    val explanation: String,
+    val hdurl: String,
+    val media_type: String,
+    val service_version: String,
+    val title: String,
+    @PrimaryKey
+    val url: String
 ) {
-        fun asModel(): PictureOfDay {
-                return PictureOfDay(
-                        media_type,title,url)
-        }
+    fun asModel(): PictureOfDay {
+        return PictureOfDay(
+            media_type, title, url, explanation
+        )
+    }
 }
 

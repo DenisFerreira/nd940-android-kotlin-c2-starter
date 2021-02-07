@@ -28,9 +28,9 @@ class RefreshDataWork(appContext: Context, params: WorkerParameters) : Coroutine
     override suspend fun doWork(): Result {
         val database = getDatabase(applicationContext)
         val repository = NasaRepository(database)
-        (database)
         return try {
-            repository.refresh()
+            repository.refreshPictureOfDay()
+            repository.refreshAsteroids()
             Result.success()
         } catch (e: HttpException) {
             Result.retry()

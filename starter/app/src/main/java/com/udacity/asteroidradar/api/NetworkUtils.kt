@@ -1,46 +1,55 @@
 package com.udacity.asteroidradar.api
 
+import android.annotation.SuppressLint
 import android.os.Parcelable
-import com.udacity.asteroidradar.models.Asteroid
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import com.udacity.asteroidradar.database.PictureofDayDBModel
+import com.udacity.asteroidradar.models.Asteroid
 import kotlinx.android.parcel.Parcelize
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-fun parseAsteroidsJsonResult(jsonResult: JSONObject): ArrayList<Asteroid> {
-    val nearEarthObjectsJson = jsonResult.getJSONObject("near_earth_objects")
 
-    val asteroidList = ArrayList<Asteroid>()
-
-    val nextSevenDaysFormattedDates = getNextSevenDaysFormattedDates()
-    for (formattedDate in nextSevenDaysFormattedDates) {
-        val dateAsteroidJsonArray = nearEarthObjectsJson.getJSONArray(formattedDate)
-
+fun parseStringToAsteroidList(response: String): List<Asteroid> {
+    val asteroidList = mutableListOf<Asteroid>()
+    val jsonObject = JSONObject(response)
+    val nearEarthObjectsJson = jsonObject.getJSONObject("near_earth_objects")
+    val dateList = nearEarthObjectsJson.keys()
+    val dateListSorted = dateList.asSequence().sorted()
+    dateListSorted.forEach {
+        val key: String = it
+        val dateAsteroidJsonArray = nearEarthObjectsJson.getJSONArray(key)
         for (i in 0 until dateAsteroidJsonArray.length()) {
             val asteroidJson = dateAsteroidJsonArray.getJSONObject(i)
             val id = asteroidJson.getLong("id")
             val codename = asteroidJson.getString("name")
             val absoluteMagnitude = asteroidJson.getDouble("absolute_magnitude_h")
             val estimatedDiameter = asteroidJson.getJSONObject("estimated_diameter")
-                    .getJSONObject("kilometers").getDouble("estimated_diameter_max")
-
+                .getJSONObject("kilometers").getDouble("estimated_diameter_max")
             val closeApproachData = asteroidJson
-                    .getJSONArray("close_approach_data").getJSONObject(0)
+                .getJSONArray("close_approach_data").getJSONObject(0)
             val relativeVelocity = closeApproachData.getJSONObject("relative_velocity")
-                    .getDouble("kilometers_per_second")
+                .getDouble("kilometers_per_second")
             val distanceFromEarth = closeApproachData.getJSONObject("miss_distance")
-                    .getDouble("astronomical")
+                .getDouble("astronomical")
             val isPotentiallyHazardous = asteroidJson
-                    .getBoolean("is_potentially_hazardous_asteroid")
-
-            val asteroid = Asteroid(id, codename, formattedDate, absoluteMagnitude,
-                    estimatedDiameter, relativeVelocity, distanceFromEarth, isPotentiallyHazardous)
+                .getBoolean("is_potentially_hazardous_asteroid")
+            val asteroid = Asteroid(
+                id,
+                codename,
+                key,
+                absoluteMagnitude,
+                estimatedDiameter,
+                relativeVelocity,
+                distanceFromEarth,
+                isPotentiallyHazardous
+            )
             asteroidList.add(asteroid)
         }
     }
-
     return asteroidList
 }
 
@@ -67,8 +76,16 @@ data class PictureOfDayRequest(
     val service_version: String,
     val title: String,
     val url: String
-) :Parcelable {
+) : Parcelable {
     fun asDatabaseModel(): PictureofDayDBModel {
-        return PictureofDayDBModel(date, explanation, hdurl, media_type, service_version, title, url)
+        return PictureofDayDBModel(
+            date,
+            explanation,
+            hdurl,
+            media_type,
+            service_version,
+            title,
+            url
+        )
     }
 }

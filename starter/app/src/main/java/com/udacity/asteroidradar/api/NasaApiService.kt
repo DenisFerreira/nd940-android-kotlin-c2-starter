@@ -20,32 +20,52 @@ package com.udacity.asteroidradar.api
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import kotlinx.coroutines.Deferred
+import okhttp3.Call
+import okhttp3.OkHttpClient
+import okhttp3.ResponseBody
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
+import java.util.concurrent.TimeUnit
 
+
+
+private val client = OkHttpClient.Builder()
+    .connectTimeout(100, TimeUnit.SECONDS)
+    .readTimeout(100, TimeUnit.SECONDS).build()
 
 private val moshi = Moshi.Builder()
-        .add(KotlinJsonAdapterFactory())
-        .build()
+    .add(KotlinJsonAdapterFactory())
+    .build()
 
 // TODO (02) Use Retrofit Builder with ScalarsConverterFactory and BASE_URL
 private val retrofit = Retrofit.Builder()
-        .addConverterFactory(MoshiConverterFactory.create(moshi))
-        .addCallAdapterFactory(CoroutineCallAdapterFactory())
-        .baseUrl(Constants.BASE_URL)
-        .build()
+    .client(client)
+    .addConverterFactory(ScalarsConverterFactory.create())
+    .addConverterFactory(MoshiConverterFactory.create(moshi))
+    .addCallAdapterFactory(CoroutineCallAdapterFactory())
+    .baseUrl(Constants.BASE_URL)
+    .build()
+
 // TODO (03) Implement the MarsApiService interface with @GET getProperties returning a String
 interface NasaApiService {
     @GET("planetary/apod")
-    fun getAPOD(@Query("api_key") key : String) : Deferred<PictureOfDayRequest>
+    suspend fun getPictureOfDay(@Query("api_key") key: String): PictureOfDayRequest
+
+    @GET("neo/rest/v1/feed")
+    suspend fun getAsteroids(
+        @Query("start_date") startDate: String,
+        @Query("end_date") endDate: String,
+        @Query("api_key") apiKey: String
+    ): String
 
 }
+
 // TODO (04) Create the MarsApi object using Retrofit to implement the MarsApiService
 object NasaApi {
-    val RETROFIT_SERVICE: NasaApiService by lazy {
+    val service: NasaApiService by lazy {
         retrofit.create(NasaApiService::class.java)
     }
 }
