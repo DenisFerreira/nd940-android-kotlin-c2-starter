@@ -18,7 +18,7 @@ class NasaRepository(private val database: NasaDatabase) {
     val pictureOfDay: LiveData<PictureOfDay?>
         get() = database.pictureofDayDAO.getPictureOfDay().map { it?.asModel() }
 
-    val asteroids: LiveData<List<Asteroid>>
+    val weekAsteroids: LiveData<List<Asteroid>>
         get() {
             val calendar = Calendar.getInstance()
             val currentTime = calendar.time
@@ -32,11 +32,24 @@ class NasaRepository(private val database: NasaDatabase) {
             )
         }
 
+    val allAsteroids: LiveData<List<Asteroid>>
+        get() = database.asteroidDAO.getAll()
+
+    val todayAsteroid: LiveData<List<Asteroid>>
+        get() {
+            val calendar = Calendar.getInstance()
+            val currentTime = calendar.time
+            val dateFormat =
+                SimpleDateFormat(Constants.API_QUERY_DATE_FORMAT, Locale.getDefault())
+            calendar.add(Calendar.DAY_OF_YEAR, 7)
+            return database.asteroidDAO.getToday(dateFormat.format(currentTime))
+        }
+
     suspend fun refreshPictureOfDay() {
         withContext(Dispatchers.IO) {
             try {
                 val apodValue =
-                    NasaApi.service.getPictureOfDay(Constants.API_KEY)
+                    NasaApi.service.getPictureOfDay()
                 database.pictureofDayDAO.insert(apodValue.asDatabaseModel())
                 Log.e("NASARepository", "Picture of Day Data Refreshed")
             } catch (e: Exception) {
@@ -56,8 +69,7 @@ class NasaRepository(private val database: NasaDatabase) {
                 val nextTime = calendar.time
                 val asteroidsresult = NasaApi.service.getAsteroids(
                     dateFormat.format(currentTime),
-                    dateFormat.format(nextTime),
-                    Constants.API_KEY
+                    dateFormat.format(nextTime)
                 )
                 val asteroids = parseStringToAsteroidList(asteroidsresult)
                 database.asteroidDAO.insertAll(asteroids)

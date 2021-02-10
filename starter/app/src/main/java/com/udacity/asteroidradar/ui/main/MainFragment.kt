@@ -28,7 +28,7 @@ class MainFragment : Fragment() {
             viewModel.navigateDetailClicked(asteroid)
         })
         binding.asteroidRecycler.adapter = adapter
-        viewModel.listAsteroid.observe(viewLifecycleOwner, Observer {
+        viewModel.asteroidsList.observe(viewLifecycleOwner, Observer {
             it?.let {
                 adapter.submitList(it)
             }
@@ -54,7 +54,19 @@ class MainFragment : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
+    /**
+     * Updates the filter in the [OverviewViewModel] when the menu items are selected from the
+     * overflow menu.
+     */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        viewModel.updateFilter(
+            when (item.itemId) {
+                R.id.show_week_menu -> MainViewModel.NasaApiFilter.SHOW_WEEK
+                R.id.show_today_menu -> MainViewModel.NasaApiFilter.SHOW_TODAY
+                else -> MainViewModel.NasaApiFilter.SHOW_ALL
+            }
+        )
         return true
     }
+
 }

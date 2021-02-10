@@ -54,8 +54,10 @@ fun bindTextViewToDisplayVelocity(textView: TextView, number: Double) {
 @BindingAdapter("PictureOfDay")
 fun bindImageUrl(imgView: ImageView, pictureOfDay: PictureOfDay?) {
     pictureOfDay?.let {
-        if(!pictureOfDay.mediaType.equals("image"))
+        if(!pictureOfDay.mediaType.equals("image")) {
+            imgView.setImageResource(R.drawable.ic_broken_image)
             return@let
+        }
         val imgUri = it.url.toUri().buildUpon().scheme("https").build()
         Glide.with(imgView.context)
                 .load(imgUri)

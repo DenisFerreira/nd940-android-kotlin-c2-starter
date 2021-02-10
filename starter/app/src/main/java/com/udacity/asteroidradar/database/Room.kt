@@ -33,11 +33,15 @@ interface PictureofDayDAO {
 
 @Dao
 interface AsteroidDAO {
-    @Query("select * from Asteroid where id = :id")
-    fun getAsteroid(id: Long): LiveData<Asteroid?>
 
     @Query("select * from Asteroid where closeApproachDate between :dateInit and :dateEnd")
     fun getAll(dateInit: String, dateEnd: String): LiveData<List<Asteroid>>
+
+    @Query("select * from Asteroid")
+    fun getAll(): LiveData<List<Asteroid>>
+
+    @Query("select * from Asteroid where closeApproachDate = :date")
+    fun getToday(date: String): LiveData<List<Asteroid>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(asteroids: List<Asteroid>)
