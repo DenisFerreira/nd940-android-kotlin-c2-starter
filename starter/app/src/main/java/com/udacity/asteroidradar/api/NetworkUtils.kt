@@ -2,6 +2,7 @@ package com.udacity.asteroidradar.api
 
 import android.annotation.SuppressLint
 import android.os.Parcelable
+import androidx.annotation.Nullable
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import com.udacity.asteroidradar.database.PictureofDayDBModel
@@ -71,7 +72,6 @@ private fun getNextSevenDaysFormattedDates(): ArrayList<String> {
 data class PictureOfDayRequest(
     val date: String,
     val explanation: String,
-    val hdurl: String,
     val media_type: String,
     val service_version: String,
     val title: String,
@@ -81,7 +81,6 @@ data class PictureOfDayRequest(
         return PictureofDayDBModel(
             date,
             explanation,
-            hdurl,
             media_type,
             service_version,
             title,
